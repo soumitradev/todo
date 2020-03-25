@@ -59,6 +59,10 @@
         }
 
         $(document).ready(function (){
+            M.AutoInit();
+            $('.modal').modal('open');
+            
+
             if (getCookie("tasks") != 0){
                 var myTasks = getCookie("tasks");
                 var newTasks = JSON.parse(myTasks);
@@ -317,6 +321,7 @@
             <div class="col l6 s12">
               <h5 class="white-text">To-Do</h5>
               <p class="grey-text text-lighten-4">A simple and powerful to-do list web app that saves your work for you.</p>
+              <a class="waves-effect waves-light btn modal-trigger blue" href="#modal1">Some info about cookies</a>
             </div>
             <div class="col l4 offset-l2 s12">
               <h5 class="white-text">Made by Soumitra Shewale (soumitradev)</h5>
@@ -329,6 +334,16 @@
         <div class="footer-copyright blue darken-4">
         </div>
       </footer>
+
+      <div id="modal1" class="modal modal-fixed-footer">
+        <div class="modal-content">
+          <h4>Cookies</h4>
+          <p>This website uses cookies to save your tasks after you close this tab. We do not collect any data from you whatsoever.</p>
+        </div>
+        <div class="modal-footer">
+          <a class="modal-close waves-effect waves-green btn-flat">Got it.</a>
+        </div>
+      </div>
 
     <script src="./js/materialize.min.js"></script>
 </body>
