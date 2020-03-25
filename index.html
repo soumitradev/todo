@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="./css/materialize.min.css">
+    <link type="text/css" rel="stylesheet" href="./css/fonts.css">
+    <link type="text/css" rel="stylesheet" href="./css/icons.css">
+    <link type="text/css" rel="stylesheet" href="./css/styles.css">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>To-Do</title>
+    <meta name="description" content="A simple and powerful to-do list web app that saves your work for you.">
+
+    <script src="./js/jquery.min.js"></script>
+    <script>
+    $(function (){
+        function createCookie(name, value, days) {
+            var expires;
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toGMTString();
+            } else {
+                expires = "";
+            }
+            document.cookie = name + "=" + value + expires + "; path=/";
+        }
+
+        function getCookie(c_name) {
+            if (document.cookie.length > 0) {
+                c_start = document.cookie.indexOf(c_name + "=");
+                if (c_start != -1) {
+                    c_start = c_start + c_name.length + 1;
+                    c_end = document.cookie.indexOf(";", c_start);
+                    if (c_end == -1) {
+                        c_end = document.cookie.length;
+                    }
+                    return unescape(document.cookie.substring(c_start, c_end));
+                }
+            }
+            return "";
+        }
+
+        function get0s(array) {
+            zeroes = [];
+            for (var i = 0; i < array.length; i++){
+                zeroes.push(array[i][0]);
+            }
+            return zeroes
+        }
+
+        function get1s(array) {
+            ones = [];
+            for (var i = 0; i < array.length; i++){
+                ones.push(array[i][1]);
+            }
+            return ones
+        }
+
+        $(document).ready(function (){
+            if (getCookie("tasks") != 0){
+                var myTasks = getCookie("tasks");
+                var newTasks = JSON.parse(myTasks);
+
+                for (var i = 0; i < newTasks.length; i++){
+                    var todotext = newTasks[i][0];
+                    var index = i + 1;
+                    
+                    if (newTasks[i][1] == "undone"){
+                        $('<li class="collection-item" id="actualli' + index + '"><label><input type="checkbox" class="todoitem" id="li' + index + '"><span>' + todotext + '</span></label><a class="btn-flat material-icons-round right deletebutton" id="delete' + index + '">delete</a></li>').appendTo($("#todolist"));
+                        $("#todolist").show();
+                    } else {
+                        $('<li class="collection-item" id="actualli' + index + '"><label><input type="checkbox" class="todoitem" id="li' + index + '" checked="checked"><span>' + todotext + '</span></label><a class="btn-flat material-icons-round right deletebutton" id="delete' + index + '">delete</a></li>').appendTo($("#donetodo"));
+                        $("#donetodo").show();
+                    }
+
+                    if ($("#donetodo").children().length == 1) {
+                        $("#donetodo").hide();
+                    }
+
+                    if ($("#todolist").children().length == 0) {
+                        $("#fillerImage").show();
+                    } else {
+                        $("#fillerImage").hide();
+                    }
+
+                    M.AutoInit();
+                }
+            }
+        });
+
+        $(".deletebutton").click(function(){
+            var prevTasks = [];
+            if (getCookie("tasks").length > 0){
+                var prevTaskCookie = getCookie("tasks");
+                prevTasks = JSON.parse(prevTaskCookie);
+            }
+
+            var index = $(this).attr("id").replace("delete", "");
+            var text = $("#actualli" + index).children("label").children("span").text();
+            prevTasks.splice(get0s(prevTasks).indexOf(text), 1);
+            var cookieText = JSON.stringify(prevTasks);
+
+            createCookie("tasks", cookieText, 36500);
+
+            $("#actualli" + index).remove();
+
+            if ($("#donetodo").children().length == 1) {
+                $("#donetodo").hide();
+            }
+
+            if ($("#todolist").children().length == 0) {
+                $("#fillerImage").show();
+            }
+        });
+
+        $(".todoitem").click(function(){
+            if ($(this).prop("checked")){
+
+                var prevTasks = [];
+                if (getCookie("tasks").length > 0){
+                    var prevTaskCookie = getCookie("tasks");
+                    prevTasks = JSON.parse(prevTaskCookie);
+                }
+
+                var index = $(this).attr("id").replace("li", "");
+                var text = $("#actualli" + index).children("label").children("span").text();
+                prevTasks[get0s(prevTasks).indexOf(text)][1] = "done";
+                var cookieText = JSON.stringify(prevTasks);
+
+                createCookie("tasks", cookieText, 36500);
+
+                $("#donetodo").append($("#actual" + $(this).attr("id")));
+
+                if ($("#donetodo").attr("hidden")){
+                    $("#donetodo").show();
+                }
+
+                if ($("#todolist").children().length == 0) {
+                    $("#fillerImage").show();
+                }
+            } else {
+                var prevTasks = [];
+                if (getCookie("tasks").length > 0){
+                    var prevTaskCookie = getCookie("tasks");
+                    prevTasks = JSON.parse(prevTaskCookie);
+                }
+
+                var index = $(this).attr("id").replace("li", "");
+                var text = $("#actualli" + index).children("label").children("span").text();
+                prevTasks[get0s(prevTasks).indexOf(text)][1] = "undone";
+                var cookieText = JSON.stringify(prevTasks);
+
+                createCookie("tasks", cookieText, 36500);
+
+                $("#todolist").append($("#actual" + $(this).attr("id")));
+
+                if ($("#donetodo").children().length == 1) {
+                    $("#donetodo").hide();
+                }
+
+                if ($("#todolist").children().length != 0) {
+                    $("#fillerImage").hide();
+                }
+            }
+        });
+
+        $(document).on('click', '.todoitem', function(){
+            if ($(this).prop("checked")){
+
+                var prevTasks = [];
+                if (getCookie("tasks").length > 0){
+                    var prevTaskCookie = getCookie("tasks");
+                    prevTasks = JSON.parse(prevTaskCookie);
+                }
+
+                var index = $(this).attr("id").replace("li", "");
+                var text = $("#actualli" + index).children("label").children("span").text();
+                prevTasks[get0s(prevTasks).indexOf(text)][1] = "done";
+                var cookieText = JSON.stringify(prevTasks);
+
+                createCookie("tasks", cookieText, 36500);
+
+                $("#donetodo").append($("#actual" + $(this).attr("id")));
+
+                if ($("#donetodo").attr("hidden")){
+                    $("#donetodo").show();
+                }
+
+                if ($("#todolist").children().length == 0) {
+                    $("#fillerImage").show();
+                }
+            } else {
+                var prevTasks = [];
+                if (getCookie("tasks").length > 0){
+                    var prevTaskCookie = getCookie("tasks");
+                    prevTasks = JSON.parse(prevTaskCookie);
+                }
+
+                var index = $(this).attr("id").replace("li", "");
+                var text = $("#actualli" + index).children("label").children("span").text();
+                prevTasks[get0s(prevTasks).indexOf(text)][1] = "undone";
+                var cookieText = JSON.stringify(prevTasks);
+
+                createCookie("tasks", cookieText, 36500);
+
+                $("#todolist").append($("#actual" + $(this).attr("id")));
+
+                if ($("#donetodo").children().length == 1) {
+                    $("#donetodo").hide();
+                }
+
+                if ($("#todolist").children().length != 0) {
+                    $("#fillerImage").hide();
+                }
+            }
+        });
+
+        $(document).on('click', '.deletebutton', function(){
+            var prevTasks = [];
+            if (getCookie("tasks").length > 0){
+                var prevTaskCookie = getCookie("tasks");
+                prevTasks = JSON.parse(prevTaskCookie);
+            }
+
+            var index = $(this).attr("id").replace("delete", "");
+            var text = $("#actualli" + index).children("label").children("span").text();
+            prevTasks.splice(get0s(prevTasks).indexOf(text), 1);
+            var cookieText = JSON.stringify(prevTasks);
+
+            createCookie("tasks", cookieText, 36500);
+
+            $("#actualli" + index).remove();
+
+            if ($("#donetodo").children().length == 1) {
+                $("#donetodo").hide();
+            }
+
+            if ($("#todolist").children().length == 0) {
+                $("#fillerImage").show();
+            }
+        });
+
+        $("#addbutton").click(function(){
+            var todotext = $("#todotaskinput").val();
+            var index = ($("#todolist").children().length + $("#donetodo").children().length);
+
+            var prevTasks = [];
+            if (getCookie("tasks").length > 0){
+                var prevTaskCookie = getCookie("tasks");
+                prevTasks = JSON.parse(prevTaskCookie);
+            }
+            prevTasks.push([todotext, "undone"]);
+
+            var cookieText = JSON.stringify(prevTasks);
+
+            createCookie("tasks", cookieText, 36500);            
+
+            $('<li class="collection-item" id="actualli' + index + '"><label><input type="checkbox" class="todoitem" id="li' + index + '"><span>' + todotext + '</span></label><a class="btn-flat material-icons-round right deletebutton" id="delete' + index + '">delete</a></li>').appendTo($("#todolist"));
+
+            if ($("#todolist").attr("hidden")) {
+                $("#todolist").show();
+            }
+
+            if (!$("#fillerImage").attr("hidden")){
+                $("#fillerImage").hide();
+            }
+
+            M.AutoInit();
+        });
+    });
+    </script>
+</head>
+<body id="body" style="background-color: #90caf9;">
+    <nav>
+        <div class="nav-wrapper blue darken-3">
+            <a href="#" class="brand-logo center">To-Do</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row" style="align-items: center;">
+            <div class="col s12" style="padding-top: 5%;">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="input-field row" style="width: 97%; padding-left: 2%;">
+                            <input id="todotaskinput" type="text">
+                            <label for="todotaskinput" style="padding-left: 2.5%;">Task to add</label>
+                            <div class="btn-floating waves-effect waves-light prefix" style="width: 40px; height: 40px; background-color: #003c8f;" id="addbutton"><i class="material-icons-round">add</i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <h5>To-Do</h5>
+                        <div id="fillerImage" style="align-items: center; width: 100%;" class="center">
+                            <span class="material-icons-round center" style="font-size: 128px; color: #1565c0;">check_circle</span>
+                            <br>
+                            <span class="center" style="font-size: 28px; color: #1565c0;">All caught up!</span>
+                        </div>
+                        <ul class="collection" style="border: 0px;" id="todolist">
+                        </ul>
+                        <ul class="collection" style="border: 0px;" id="donetodo" hidden>
+                            <h5>Done</h5>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="page-footer blue darken-4">
+        <div class="container">
+          <div class="row">
+            <div class="col l6 s12">
+              <h5 class="white-text">To-Do</h5>
+              <p class="grey-text text-lighten-4">A simple and powerful to-do list web app that saves your work for you.</p>
+            </div>
+            <div class="col l4 offset-l2 s12">
+              <h5 class="white-text">Made by Soumitra Shewale (soumitradev)</h5>
+              <ul>
+                <li><a class="grey-text text-lighten-3" href="https://www.github.com/soumitradev">GitHub</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer-copyright blue darken-4">
+        </div>
+      </footer>
+
+    <script src="./js/materialize.min.js"></script>
+</body>
+
+</html>
